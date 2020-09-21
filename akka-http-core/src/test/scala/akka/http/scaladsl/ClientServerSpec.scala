@@ -898,12 +898,11 @@ Host: example.com
       val (hostname, port) = SocketUtil.temporaryServerHostnameAndPort()
       val request = HttpRequest(uri = s"http://$hostname:$port", headers = headers.Connection("close") :: Nil)
 
-      val serverConnectionContext = ExampleHttpContexts.exampleServerContext
-
-      val routes: Flow[HttpRequest, HttpResponse, Any] = Flow[HttpRequest].map { _ => ??? }
       val serverBinding =
         Http()
-          .bindAndHandle(routes, hostname, port, connectionContext = serverConnectionContext)
+          .newServerAt(hostname, port)
+          .enableHttps(ExampleHttpContexts.exampleServerContext)
+          .bind(_ => ???)
           .futureValue
 
       val failure = Http()
@@ -913,7 +912,8 @@ Host: example.com
 
       failure.getMessage should include("Connection reset by peer")
 
-      serverBinding.unbind()
+      serverBinding.unbind().futureValue
+      Http().shutdownAllConnectionPools()
     }
 
   }
