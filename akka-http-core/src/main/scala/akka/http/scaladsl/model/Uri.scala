@@ -881,7 +881,7 @@ object Uri {
       }
     }
     if (hasDotOrDotDotSegment(path))
-      if(path.startsWithSlash) process(path) else process(Slash(path)).tail
+      if (path.startsWithSlash) process(path) else process(Slash(path)).tail
     else path
   }
 
